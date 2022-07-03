@@ -37,7 +37,57 @@ public class Attributes {
 				}
 			}
 		}
+		for (int i =0; i<pixels.length;i++) {
+            for(int j =0; j<pixels[i].length;j++) {
+                System.out.print(pixels[i][j]);
+            }
+            System.out.println();
+        }
+		int [] x = new int[4];
+		x=boundingBox(pixels);
+		for(int k=0; k<x.length;k++) {
+			System.out.println(x[k]);
+		}
 		return pixels;
+	}
+	
+	public int[] boundingBox(int [][] pixls) {
+		int top=-1;
+		int bottom=-1;
+		int left=-1;
+		int right=-1;
+		int [] bb = new int[4];
+		for(int i=0; i<pixls.length; i++) {
+			for(int j=0; j<pixls[i].length; j++) {
+				//top boundary
+				if(pixls[i][j]==1 && top==-1) {
+					top = i;
+				}
+				//bottom boundary
+				if(pixls[i][j]==1) {
+					bottom = i;
+				}
+				//left boundary
+				if(pixls[i][j]==1) {
+					if(left==-1)
+						left = j;
+					else if(j<left)
+						left=j;
+				}
+				//right boundary
+				if(pixls[i][j]==1) {
+					if(right==-1)
+						right =j;
+					else if(j>right)
+						right=j;
+				}	
+			}
+		}
+		bb[0]=top;
+		bb[1]=bottom;
+		bb[2]=left;
+		bb[3]=right;
+		return bb;
 	}
 	
 	
