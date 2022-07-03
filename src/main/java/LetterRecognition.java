@@ -26,8 +26,7 @@ public class LetterRecognition {
 	private String tempPath;
 	
 	Attributes attr = new Attributes();
-	int a[][] = attr.getImageToPixels(attr.loadImage());
-	int bb[] = attr.boundingBox(a);
+	String[] attributes = attr.getAttributes();
 	
 	public File downloadData(String[] args) throws MalformedURLException {
 		if (args.length != 0) {
@@ -134,22 +133,9 @@ public class LetterRecognition {
 
 			//while (csv.next()) {
 				StringBuilder result = new StringBuilder();
-				line[0] = attr.getAttr1(bb);
-				line[1] = attr.getAttr2(bb);
-				line[2] = attr.getAttr3(bb);
-				line[3] = attr.getAttr4(bb);
-				line[4] = attr.getAttr5(bb,a);
-				line[5] = attr.getAttr6(a);
-				line[6] = attr.getAttr7(a);
-				line[7] = attr.getAttr8(a);
-				line[8] = attr.getAttr9(a);
-				line[9] = attr.getAttr10(a);
-				line[10] = attr.getAttr11(a);
-				line[11] = attr.getAttr12(a);
-				line[12] = attr.getAttr13(a);
-				line[13] = attr.getAttr14(a);
-				line[14] = attr.getAttr15(a);
-				line[15] = attr.getAttr16(a);
+				for(int i =0; i<16;i++) {
+					line[i] = attributes[i];
+				}
 				
 				//String correct = csv.get(0);
 				helper.normalizeInputVector(line, input.getData(), false);
