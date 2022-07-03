@@ -4,9 +4,10 @@ import javax.imageio.ImageIO;
 
 public class Attributes {
 	public int[][] pixels = getImageToPixels(loadImage());
-	public int[][] boundingBoxTable = storeBoundingBox(boundingBox(pixels),pixels);
+	public int[] indexes = boundingBox(pixels);
+	public int[][] boundingBoxTable = storeBoundingBox(pixels);
 	
-	public int[][] storeBoundingBox(int[] indexes, int[][] table){
+	public int[][] storeBoundingBox(int[][] table){
 		int[][] bbTable = new int[indexes[1]-indexes[0]+1][indexes[3]-indexes[2]+1];
 		for(int i = indexes[0]; i<=indexes[1];i++) {
 			for(int j=indexes[2];j<=indexes[3];j++) {
@@ -49,17 +50,8 @@ public class Attributes {
 				}
 			}
 		}
-		for (int i =0; i<pixels.length;i++) {
-            for(int j =0; j<pixels[i].length;j++) {
-                System.out.print(pixels[i][j]);
-            }
-            System.out.println();
-        }
 		int [] x = new int[4];
 		x=boundingBox(pixels);
-		for(int k=0; k<x.length;k++) {
-			System.out.println(x[k]);
-		}
 		return pixels;
 	}
 	
@@ -102,7 +94,6 @@ public class Attributes {
 		return bb;
 	}
 	
-	
 	private int[] getCartesianCoordinates(int[] pos, int[][] table){
 		int[] coords = new int[2];
 		double[] center = new double[2];
@@ -124,91 +115,213 @@ public class Attributes {
 		return coords;
 	}
 	
-	
-	public String getAttr1(int [] BB) {
-		int attr1 = BB[2]+(BB[3]-BB[2])/2; //x-box
-		return Integer.toString(attr1);
+	private double getAttr1() {
+		double attr1 = indexes[2]+(indexes[3]-indexes[2])/2; //x-box
+		return attr1;
 	}
 	
-	public String getAttr2(int [] BB) {
-		int attr2 = BB[0]+(BB[1]-BB[0])/2; //y-box
-		return Integer.toString(attr2);
+	private double getAttr2() {
+		double attr2 = indexes[0]+(indexes[1]-indexes[0])/2; //y-box
+		return attr2;
 	}
 	
-	public String getAttr3(int [] BB) {
-		int attr3 = BB[3]-BB[2]+1; //width of bb
-		return Integer.toString(attr3);
+	private double getAttr3() {
+		double attr3 = indexes[3]-indexes[2]+1; //width of bb
+		return attr3;
 	}
 	
-	public String getAttr4(int [] BB) {
-        int attr4 = BB[1]-BB[0]+1; //height of bb
-        return Integer.toString(attr4);
+	private double getAttr4() {
+		double attr4 = indexes[1]-indexes[0]+1; //height of bb
+        return attr4;
     }
 
-    public String getAttr5(int [] BB, int [][] pixls) {
-        int attr5 = 0; //num of 1s
-        for(int i=BB[0]; i<=BB[1]; i++) {
-        	for(int j=BB[2]; j<=BB[3]; j++) {
-        		if(pixls[i][j]==1)
+    private double getAttr5() {
+    	double attr5 = 0; //num of 1s
+        for(int i=indexes[0]; i<=indexes[1]; i++) {
+        	for(int j=indexes[2]; j<=indexes[3]; j++) {
+        		if(pixels[i][j]==1)
         			attr5++;
         	}
         }
-        return Integer.toString(attr5);
+        return attr5;
     }
 
-    public String getAttr6(int [][] pixls) {
-        int attr6 = 0; //mean horizontal position of on pixels
-        return Integer.toString(attr6);
+    private double getAttr6() {
+        double attr6 = 0; //mean horizontal position of on pixels
+        int counter = 0;
+        int sum = 0;
+        for (int i =0;i<boundingBoxTable.length;i++) {
+        	for (int j=0; j<boundingBoxTable[i].length;j++) {
+        		if(boundingBoxTable[i][j] == 1) {
+        			counter++;
+        			sum += getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[0];
+        		}
+        	}
+        }
+        attr6 = (((double)sum)/((double)counter)) / ((double)boundingBoxTable[0].length);
+        return attr6;
     }
 
-    public String getAttr7(int [][] pixls) {
-        int attr7 = 0; //width
-        return Integer.toString(attr7);
+    private double getAttr7() {
+    	double attr7 = 0; //mean vertical position of on pixels
+        int counter = 0;
+        int sum = 0;
+        for (int i =0;i<boundingBoxTable.length;i++) {
+        	for (int j=0; j<boundingBoxTable[i].length;j++) {
+        		if(boundingBoxTable[i][j] == 1) {
+        			counter++;
+        			sum += getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[1];
+        		}
+        	}
+        }
+        attr7 = (((double)sum)/((double)counter)) / ((double)boundingBoxTable.length);
+        return attr7;
     }
 
-    public String getAttr8(int [][] pixls) {
-        int attr8 = 0; //width
-        return Integer.toString(attr8);
+    private double getAttr8() {
+    	double attr8 = 0; //mean squared horizontal position of on pixels
+        int counter = 0;
+        int sum = 0;
+        for (int i =0;i<boundingBoxTable.length;i++) {
+        	for (int j=0; j<boundingBoxTable[i].length;j++) {
+        		if(boundingBoxTable[i][j] == 1) {
+        			counter++;
+        			int x = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[0];
+        			sum += x*x;
+        		}
+        	}
+        }
+        attr8 = ((double)sum)/((double)counter);
+        return attr8;
     }
 
-    public String getAttr9(int [][] pixls) {
-        int attr9 = 0; //width
-        return Integer.toString(attr9);
+    private double getAttr9() {
+    	double attr9 = 0; //mean squared vertical position of on pixels
+        int counter = 0;
+        int sum = 0;
+        for (int i =0;i<boundingBoxTable.length;i++) {
+        	for (int j=0; j<boundingBoxTable[i].length;j++) {
+        		if(boundingBoxTable[i][j] == 1) {
+        			counter++;
+        			int y = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[1];
+        			sum += y*y;
+        		}
+        	}
+        }
+        attr9 = ((double)sum)/((double)counter);
+        return attr9;
     }
 
-    public String getAttr11(int [][] pixls) {
-        int attr11 = 0; //width
-        return Integer.toString(attr11);
+    private double getAttr10() {
+    	double attr10 = 0; //mean product of horizontal and vertical position of on pixels
+        int counter = 0;
+        int sum = 0;
+        for (int i =0;i<boundingBoxTable.length;i++) {
+        	for (int j=0; j<boundingBoxTable[i].length;j++) {
+        		if(boundingBoxTable[i][j] == 1) {
+        			counter++;
+        			int x = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[0];
+        			int y = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[1];
+        			sum += x*y;
+        		}
+        	}
+        }
+        attr10 = ((double)sum)/((double)counter);
+        return attr10;
+    }
+    
+    private double getAttr11() {
+    	double attr11 = 0; //mean product of  squared horizontal and vertical position of on pixels
+        int counter = 0;
+        int sum = 0;
+        for (int i =0;i<boundingBoxTable.length;i++) {
+        	for (int j=0; j<boundingBoxTable[i].length;j++) {
+        		if(boundingBoxTable[i][j] == 1) {
+        			counter++;
+        			int x = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[0];
+        			int y = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[1];
+        			sum += x*x*y;
+        		}
+        	}
+        }
+        attr11 = ((double)sum)/((double)counter);
+        return attr11;
     }
 
-    public String getAttr10(int [][] pixls) {
-        int attr10 = 0; //width
-        return Integer.toString(attr10);
+    private double getAttr12() {
+    	double attr12 = 0; //mean product of  horizontal and squared vertical position of on pixels
+        int counter = 0;
+        int sum = 0;
+        for (int i =0;i<boundingBoxTable.length;i++) {
+        	for (int j=0; j<boundingBoxTable[i].length;j++) {
+        		if(boundingBoxTable[i][j] == 1) {
+        			counter++;
+        			int x = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[0];
+        			int y = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[1];
+        			sum += x*y*y;
+        		}
+        	}
+        }
+        attr12 = ((double)sum)/((double)counter);
+        return attr12;
     }
 
-    public String getAttr12(int [][] pixls) {
-        int attr12 = 0; //width
-        return Integer.toString(attr12);
+    private double getAttr13() {
+    	double attr13 = 0; //width
+        return attr13;
     }
 
-    public String getAttr13(int [][] pixls) {
-        int attr13 = 0; //width
-        return Integer.toString(attr13);
+    private double getAttr14() {
+    	double attr14 = 0; //width
+        return attr14;
     }
 
-    public String getAttr14(int [][] pixls) {
-        int attr14 = 0; //width
-        return Integer.toString(attr14);
+    private double getAttr15() {
+    	double attr15 = 0; //width
+        return attr15;
     }
 
-    public String getAttr15(int [][] pixls) {
-        int attr15 = 0; //width
-        return Integer.toString(attr15);
-    }
-
-    public String getAttr16(int [][] pixls) {
-        int attr16 = 0; //width
-        return Integer.toString(attr16);
+    private double getAttr16() {
+    	double attr16 = 0; //width
+        return attr16;
     }
 	
+    public String[] getAttributes () {
+    	//scaling to 0-15 and return as string
+    	String[] attributes = new String[16];
+    	double[] results = new double[16];
+    	results[0] = getAttr1();
+    	results[1] = getAttr2();
+    	results[2] = getAttr3();
+    	results[3] = getAttr4();
+    	results[4] = getAttr5();
+    	results[5] = getAttr6();
+    	results[6] = getAttr7();
+    	results[7] = getAttr8();
+    	results[8] = getAttr9();
+    	results[9] = getAttr10();
+    	results[10] = getAttr11();
+    	results[11] = getAttr12();
+    	results[12] = getAttr13();
+    	results[13] = getAttr14();
+    	results[14] = getAttr15();
+    	results[15] = getAttr16();
+    	double min = results[0];
+    	double max = results[0];
+    	for(int i = 0; i<results.length;i++) {
+    		if(results[i]<min) {
+    			min = results[i];
+    		}
+    		if(results[i]>max) {
+    			max = results[i];
+    		}
+    	}
+    	for(int i = 0; i<results.length;i++) {
+    		results[i] = ((results[i]-min)/(max-min))*15;
+    	}
+    	for(int i = 0; i<attributes.length;i++) {
+    		attributes[i] = Integer.toString((int) Math.round(results[i]));
+    	}
+    	return attributes;
+    }
 }
