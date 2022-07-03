@@ -26,7 +26,7 @@ public class LetterRecognition {
 	private String tempPath;
 	
 	Attributes attr = new Attributes();
-	String[] attributes = attr.getAttributes();
+	String[] attributes = attr.getAttributes();	
 	
 	public File downloadData(String[] args) throws MalformedURLException {
 		if (args.length != 0) {

@@ -3,6 +3,7 @@ import java.io.File;
 import javax.imageio.ImageIO;
 
 public class Attributes {
+	
 	public int[][] pixels = getImageToPixels(loadImage());
 	public int[] indexes = boundingBox(pixels);
 	public int[][] boundingBoxTable = storeBoundingBox(pixels);
@@ -19,7 +20,7 @@ public class Attributes {
 	
 	public BufferedImage loadImage() {
 		try {
-			BufferedImage bufferedImage = ImageIO.read(new File("/Users/sissy/Desktop/Untitled.png"));
+			BufferedImage bufferedImage = ImageIO.read(new File("alpha.png"));
 			return bufferedImage;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -50,8 +51,6 @@ public class Attributes {
 				}
 			}
 		}
-		int [] x = new int[4];
-		x=boundingBox(pixels);
 		return pixels;
 	}
 	
@@ -94,6 +93,7 @@ public class Attributes {
 		return bb;
 	}
 	
+	
 	private int[] getCartesianCoordinates(int[] pos, int[][] table){
 		int[] coords = new int[2];
 		double[] center = new double[2];
@@ -115,6 +115,7 @@ public class Attributes {
 		return coords;
 	}
 	
+	
 	private double getAttr1() {
 		double attr1 = indexes[2]+(indexes[3]-indexes[2])/2; //x-box
 		return attr1;
@@ -135,7 +136,7 @@ public class Attributes {
         return attr4;
     }
 
-    private double getAttr5() {
+	private double getAttr5() {
     	double attr5 = 0; //num of 1s
         for(int i=indexes[0]; i<=indexes[1]; i++) {
         	for(int j=indexes[2]; j<=indexes[3]; j++) {
@@ -266,26 +267,66 @@ public class Attributes {
         return attr12;
     }
 
-    private double getAttr13() {
-    	double attr13 = 0; //width
+    public double getAttr13() {
+        double attr13 = 0.0; //x-edge
+        for(int i=0; i<boundingBoxTable.length; i++) {
+        	for(int j=0; j<boundingBoxTable[i].length; j++) {
+        		if(boundingBoxTable[i][j]==1 && j==0)
+        			attr13++;
+        		else if(boundingBoxTable[i][j]==1 && boundingBoxTable[i][j-1]==0) {
+        			attr13++;
+        		}
+        	}
+        }
+        attr13 = attr13 / (double)boundingBoxTable[0].length;
         return attr13;
     }
 
-    private double getAttr14() {
-    	double attr14 = 0; //width
+    public double getAttr14() {
+        double attr14 = 0.0; //xegvy
+        for(int i=0; i<boundingBoxTable.length; i++) {
+        	for(int j=0; j<boundingBoxTable[i].length; j++) {
+        		if(boundingBoxTable[i][j]==1 && j==0)
+        			attr14+=getCartesianCoordinates(new int[] {i,j}, boundingBoxTable)[1];
+        		else if(boundingBoxTable[i][j]==1 && boundingBoxTable[i][j-1]==0) {
+        			attr14+=getCartesianCoordinates(new int[] {i,j}, boundingBoxTable)[1];
+        		}
+        	}
+        }
         return attr14;
     }
 
-    private double getAttr15() {
-    	double attr15 = 0; //width
+    public double getAttr15() {
+        double attr15 = 0.0; //y-edge
+        for(int i=0; i<boundingBoxTable.length; i++) {
+        	for(int j=0; j<boundingBoxTable[i].length; j++) {
+        		if(boundingBoxTable[i][j]==1 && i==boundingBoxTable.length-1)
+        			attr15++;
+        		else if(boundingBoxTable[i][j]==1 && boundingBoxTable[i+1][j]==0) {
+        			attr15++;
+        		}
+        	}
+        }
+        attr15 = attr15 / (double)boundingBoxTable.length;
         return attr15;
     }
 
-    private double getAttr16() {
-    	double attr16 = 0; //width
+    public double getAttr16() {
+        double attr16 = 0.0; //yegvx
+        for(int i=0; i<boundingBoxTable.length; i++) {
+        	for(int j=0; j<boundingBoxTable[i].length; j++) {
+        		if(boundingBoxTable[i][j]==1 && i==boundingBoxTable.length-1)
+        			attr16+=getCartesianCoordinates(new int[] {i,j}, boundingBoxTable)[0];
+        		else if(boundingBoxTable[i][j]==1 && boundingBoxTable[i+1][j]==0) {
+        			attr16+=getCartesianCoordinates(new int[] {i,j}, boundingBoxTable)[0];
+        		}
+        	}
+        }
         return attr16;
     }
-	
+    
+    
+    
     public String[] getAttributes () {
     	//scaling to 0-15 and return as string
     	String[] attributes = new String[16];
@@ -324,4 +365,5 @@ public class Attributes {
     	}
     	return attributes;
     }
+	
 }
