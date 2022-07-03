@@ -10,7 +10,7 @@ public class Attributes {
 		int[][] bbTable = new int[indexes[1]-indexes[0]+1][indexes[3]-indexes[2]+1];
 		for(int i = indexes[0]; i<indexes[1];i++) {
 			for(int j=indexes[2];j<indexes[3];j++) {
-				bbTable[i][j] = table[i][j];
+				bbTable[i-indexes[0]][j-indexes[2]] = table[i][j];
 			}
 		}
 		return bbTable;
@@ -158,7 +158,6 @@ public class Attributes {
 
     public String getAttr6(int [][] pixls) {
         int attr6 = 0; //mean horizontal position of on pixels
-        for 
         return Integer.toString(attr6);
     }
 
