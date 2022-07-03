@@ -5,7 +5,7 @@ import javax.imageio.ImageIO;
 public class Attributes {
 	public BufferedImage loadImage() {
 		try {
-			BufferedImage bufferedImage = ImageIO.read(new File("/Users/sissy/Desktop/Untitled.png"));
+			BufferedImage bufferedImage = ImageIO.read(new File("alpha.jpg"));
 			return bufferedImage;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -13,7 +13,7 @@ public class Attributes {
 		return null;
 	}
 	
-	public static int[][] getImageToPixels(BufferedImage bufferedImage){
+	public int[][] getImageToPixels(BufferedImage bufferedImage){
 		if (bufferedImage == null) {
 			throw new IllegalArgumentException();
 		}
@@ -39,8 +39,21 @@ public class Attributes {
 		return pixels;
 	}
 	
-	public BufferedImage letter = loadImage();
-	public int[][]pixels = getImageToPixels(letter);
+	
+	public String getAttr1(int [][] pixls) {
+		int attr1 = 0; //x-box
+		return Integer.toString(attr1);
+	}
+	
+	public String getAttr2(int [][] pixls) {
+		int attr2 = 0; //y-box
+		return Integer.toString(attr2);
+	}
+	
+	public String getAttr3(int [][] pixls) {
+		int attr3 = 0; //width
+		return Integer.toString(attr3);
+	}
 	
 	
 	
