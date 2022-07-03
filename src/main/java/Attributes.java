@@ -3,9 +3,22 @@ import java.io.File;
 import javax.imageio.ImageIO;
 
 public class Attributes {
+	public int[][] pixels = getImageToPixels(loadImage());
+	public int[][] boundingBoxTable = storeBoundingBox(boundingBox(pixels),pixels);
+	
+	public int[][] storeBoundingBox(int[] indexes, int[][] table){
+		int[][] bbTable = new int[indexes[1]-indexes[0]+1][indexes[3]-indexes[2]+1];
+		for(int i = indexes[0]; i<indexes[1];i++) {
+			for(int j=indexes[2];j<indexes[3];j++) {
+				bbTable[i][j] = table[i][j];
+			}
+		}
+		return bbTable;
+	}
+	
 	public BufferedImage loadImage() {
 		try {
-			BufferedImage bufferedImage = ImageIO.read(new File("alpha.png"));
+			BufferedImage bufferedImage = ImageIO.read(new File("/Users/sissy/Desktop/Untitled.png"));
 			return bufferedImage;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -144,7 +157,8 @@ public class Attributes {
     }
 
     public String getAttr6(int [][] pixls) {
-        int attr6 = 0; //width
+        int attr6 = 0; //mean horizontal position of on pixels
+        for 
         return Integer.toString(attr6);
     }
 
