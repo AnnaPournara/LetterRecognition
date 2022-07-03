@@ -27,6 +27,7 @@ public class LetterRecognition {
 	
 	Attributes attr = new Attributes();
 	int a[][] = attr.getImageToPixels(attr.loadImage());
+	
 	public File downloadData(String[] args) throws MalformedURLException {
 		if (args.length != 0) {
 			tempPath = args[0];
@@ -125,42 +126,44 @@ public class LetterRecognition {
 			// training set. You do not need to retrain, simply use the NormalizationHelper
 			// class. After you train, you can save the NormalizationHelper to later
 			// normalize and denormalize your data.
-			ReadCSV csv = new ReadCSV(letterRecognitionFile, false, CSVFormat.DECIMAL_POINT);
+			
+			//ReadCSV csv = new ReadCSV(letterRecognitionFile, false, CSVFormat.DECIMAL_POINT);
 			String[] line = new String[16];
 			MLData input = helper.allocateInputVector();
 
-			while (csv.next()) {
+			//while (csv.next()) {
 				StringBuilder result = new StringBuilder();
-				line[0] = csv.get(1);
-				line[1] = csv.get(2);
-				line[2] = csv.get(3);
-				line[3] = csv.get(4);
-				line[4] = csv.get(5);
-				line[5] = csv.get(6);
-				line[6] = csv.get(7);
-				line[7] = csv.get(8);
-				line[8] = csv.get(9);
-				line[9] = csv.get(10);
-				line[10] = csv.get(11);
-				line[11] = csv.get(12);
-				line[12] = csv.get(13);
-				line[13] = csv.get(14);
-				line[14] = csv.get(15);
-				line[15] = csv.get(16);
-				String correct = csv.get(0);
+				line[0] = attr.getAttr1(a);
+				line[1] = attr.getAttr2(a);
+				line[2] = attr.getAttr3(a);
+				line[3] = attr.getAttr4(a);
+				line[4] = attr.getAttr5(a);
+				line[5] = attr.getAttr6(a);
+				line[6] = attr.getAttr7(a);
+				line[7] = attr.getAttr8(a);
+				line[8] = attr.getAttr9(a);
+				line[9] = attr.getAttr10(a);
+				line[10] = attr.getAttr11(a);
+				line[11] = attr.getAttr12(a);
+				line[12] = attr.getAttr13(a);
+				line[13] = attr.getAttr14(a);
+				line[14] = attr.getAttr15(a);
+				line[15] = attr.getAttr16(a);
+				
+				//String correct = csv.get(0);
 				helper.normalizeInputVector(line, input.getData(), false);
 				MLData output = bestMethod.compute(input);
 				String letterChosen = helper.denormalizeOutputVectorToString(output)[0];
 
-				result.append(Arrays.toString(line));
+				//result.append(Arrays.toString(line));
 				result.append(" -> predicted: ");
 				result.append(letterChosen);
-				result.append("(correct: ");
-				result.append(correct);
-				result.append(")");
+				//result.append("(correct: ");
+				//result.append(correct);
+				//result.append(")");
 
 				System.out.println(result.toString());
-			}
+			//}
 
 			// Delete data file and shut down.
 			letterRecognitionFile.delete();
