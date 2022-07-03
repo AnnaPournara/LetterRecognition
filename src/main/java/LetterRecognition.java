@@ -27,6 +27,7 @@ public class LetterRecognition {
 	
 	Attributes attr = new Attributes();
 	int a[][] = attr.getImageToPixels(attr.loadImage());
+	int bb[] = attr.boundingBox(a);
 	
 	public File downloadData(String[] args) throws MalformedURLException {
 		if (args.length != 0) {
@@ -133,11 +134,11 @@ public class LetterRecognition {
 
 			//while (csv.next()) {
 				StringBuilder result = new StringBuilder();
-				line[0] = attr.getAttr1(a);
-				line[1] = attr.getAttr2(a);
-				line[2] = attr.getAttr3(a);
-				line[3] = attr.getAttr4(a);
-				line[4] = attr.getAttr5(a);
+				line[0] = attr.getAttr1(bb);
+				line[1] = attr.getAttr2(bb);
+				line[2] = attr.getAttr3(bb);
+				line[3] = attr.getAttr4(bb);
+				line[4] = attr.getAttr5(bb,a);
 				line[5] = attr.getAttr6(a);
 				line[6] = attr.getAttr7(a);
 				line[7] = attr.getAttr8(a);
@@ -155,7 +156,7 @@ public class LetterRecognition {
 				MLData output = bestMethod.compute(input);
 				String letterChosen = helper.denormalizeOutputVectorToString(output)[0];
 
-				//result.append(Arrays.toString(line));
+				result.append(Arrays.toString(line));
 				result.append(" -> predicted: ");
 				result.append(letterChosen);
 				//result.append("(correct: ");
