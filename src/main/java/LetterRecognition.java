@@ -1,4 +1,6 @@
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -21,30 +23,76 @@ import org.encog.util.csv.ReadCSV;
 import org.encog.util.simple.EncogUtility;
 
 public class LetterRecognition {
-	public static String DATA_URL = "https://archive.ics.uci.edu/ml/machine-learning-databases/letter-recognition/letter-recognition.data";
-
 	private String tempPath;
+//	Attributes attr = new Attributes(tempPath);
+//	String[] attributes = attr.getAttributes();
 	
-	Attributes attr = new Attributes();
-	String[] attributes = attr.getAttributes();	
-	
-	public File downloadData(String[] args) throws MalformedURLException {
+	public File createData(String[] args) throws MalformedURLException {
 		if (args.length != 0) {
 			tempPath = args[0];
 		} else {
-			tempPath = System.getProperty("java.io.tmpdir");
+			tempPath = System.getProperty("user.dir");
 		}
-
 		File letterRecognitionFile = new File(tempPath, "letter.csv");
-		BotUtil.downloadPage(new URL(LetterRecognition.DATA_URL), letterRecognitionFile);
-		System.out.println("Downloading letter dataset to: " + letterRecognitionFile);
+		try {
+			FileWriter myWriter = new FileWriter("letter.csv");
+			for (int i=0; i<new File(tempPath+"/a").list().length;i++) {
+				Attributes attr = new Attributes((String)("a/" + new File(tempPath+"/a").list()[i]));
+				String[] attributes = attr.getAttributes();
+				myWriter.write("A");
+				for(int j=0;j<attributes.length;j++) {
+					String m = ","+attributes[j];
+					System.out.println(m);
+					myWriter.write(m);		
+				}
+				myWriter.write("\n");
+			}
+			for (int i=0; i<new File(tempPath+"/b").list().length;i++) {
+				Attributes attr = new Attributes((String)("b/" + new File(tempPath+"/b").list()[i]));
+				String[] attributes = attr.getAttributes();
+				myWriter.write("B");
+				for(int j=0;j<attributes.length;j++) {
+					String m = ","+attributes[j];
+					System.out.println(m);
+					myWriter.write(m);		
+				}
+				myWriter.write("\n");
+			}
+			for (int i=0; i<new File(tempPath+"/c").list().length;i++) {
+				Attributes attr = new Attributes((String)("c/" + new File(tempPath+"/c").list()[i]));
+				String[] attributes = attr.getAttributes();
+				myWriter.write("C");
+				for(int j=0;j<attributes.length;j++) {
+					String m = ","+attributes[j];
+					System.out.println(m);
+					myWriter.write(m);		
+				}
+				myWriter.write("\n");
+			}
+			for (int i=0; i<new File(tempPath+"/d").list().length;i++) {
+				Attributes attr = new Attributes((String)("d/" + new File(tempPath+"/d").list()[i]));
+				String[] attributes = attr.getAttributes();
+				myWriter.write("D");
+				for(int j=0;j<attributes.length;j++) {
+					String m = ","+attributes[j];
+					System.out.println(m);
+					myWriter.write(m);		
+				}
+				myWriter.write("\n");
+			}
+			myWriter.close();
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+//		BotUtil.downloadPage(new URL(LetterRecognition.DATA_URL), letterRecognitionFile);
+		System.out.println("Adding values to dataset: " + letterRecognitionFile);
 		return letterRecognitionFile;
 	}
 
 	public void run(String[] args) {
 		try {
 			// Download the data that we will attempt to model.
-			File letterRecognitionFile = downloadData(args);
+			File letterRecognitionFile = createData(args);
 
 			// Define the format of the data file.
 			// This area will change, depending on the columns and
@@ -100,13 +148,13 @@ public class LetterRecognition {
 			// Shuffle the data into a random ordering.
 			// Use a seed of 1001 so that we always use the same holdback and will get more
 			// consistent results.
-			model.holdBackValidation(0.5, true, 1001);
+			model.holdBackValidation(0.3, true, 1001);
 
 			// Choose whatever is the default training type for this model.
 			model.selectTrainingType(data);
 
 			// Use a 5-fold cross-validated train. Return the best method found.
-			MLRegression bestMethod = (MLRegression) model.crossvalidate(3, true);
+			MLRegression bestMethod = (MLRegression) model.crossvalidate(5, true);
 
 			// Display the training and validation errors.
 			System.out.println(
@@ -130,7 +178,8 @@ public class LetterRecognition {
 			//ReadCSV csv = new ReadCSV(letterRecognitionFile, false, CSVFormat.DECIMAL_POINT);
 			String[] line = new String[16];
 			MLData input = helper.allocateInputVector();
-
+			Attributes test =new Attributes("/Users/sissy/Desktop/Untitled.png");
+			String[] attributes = test.getAttributes();
 			//while (csv.next()) {
 				StringBuilder result = new StringBuilder();
 				for(int i =0; i<16;i++) {
@@ -139,6 +188,10 @@ public class LetterRecognition {
 				
 				//String correct = csv.get(0);
 				helper.normalizeInputVector(line, input.getData(), false);
+				for(int i=0;i<line.length;i++) {
+					System.out.print(line[i] + ", ");
+				}
+				System.out.println();
 				MLData output = bestMethod.compute(input);
 				String letterChosen = helper.denormalizeOutputVectorToString(output)[0];
 
@@ -153,7 +206,7 @@ public class LetterRecognition {
 			//}
 
 			// Delete data file and shut down.
-			letterRecognitionFile.delete();
+			//letterRecognitionFile.delete();
 			Encog.getInstance().shutdown();
 
 		} catch (Exception ex) {
