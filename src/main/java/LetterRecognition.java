@@ -2,10 +2,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 
 import org.encog.ConsoleStatusReportable;
 import org.encog.Encog;
+import org.encog.bot.BotUtil;
 import org.encog.ml.MLRegression;
 import org.encog.ml.data.MLData;
 import org.encog.ml.data.versatile.NormalizationHelper;
@@ -17,73 +19,43 @@ import org.encog.ml.data.versatile.sources.VersatileDataSource;
 import org.encog.ml.factory.MLMethodFactory;
 import org.encog.ml.model.EncogModel;
 import org.encog.util.csv.CSVFormat;
+import org.encog.util.csv.ReadCSV;
 import org.encog.util.simple.EncogUtility;
-
 import javax.swing.*;
 
 public class LetterRecognition {
 	private String tempPath;
 	public static String imagePath;
-	
+//	Attributes attr = new Attributes(tempPath);
+//	String[] attributes = attr.getAttributes();
+
 	public File createData(String[] args) throws MalformedURLException {
 		if (args.length != 0) {
 			tempPath = args[0];
 		} else {
 			tempPath = System.getProperty("user.dir");
 		}
-		
 		File letterRecognitionFile = new File(tempPath, "letter.csv");
 		try {
 			FileWriter myWriter = new FileWriter("letter.csv");
-			for (int i=0; i<new File(tempPath+"/a").list().length;i++) {
-				Attributes attr = new Attributes((String)("a/" + new File(tempPath+"/a").list()[i]));
-				String[] attributes = attr.getAttributes();
-				myWriter.write("A");
-				for(int j=0;j<attributes.length;j++) {
-					String m = ","+attributes[j];
-					//System.out.println(m);
-					myWriter.write(m);		
-				}
-				myWriter.write("\n");
-			}
-			for (int i=0; i<new File(tempPath+"/b").list().length;i++) {
-				Attributes attr = new Attributes((String)("b/" + new File(tempPath+"/b").list()[i]));
-				String[] attributes = attr.getAttributes();
-				myWriter.write("B");
-				for(int j=0;j<attributes.length;j++) {
-					String m = ","+attributes[j];
-					//System.out.println(m);
-					myWriter.write(m);		
-				}
-				myWriter.write("\n");
-			}
-			for (int i=0; i<new File(tempPath+"/c").list().length;i++) {
-				Attributes attr = new Attributes((String)("c/" + new File(tempPath+"/c").list()[i]));
-				String[] attributes = attr.getAttributes();
-				myWriter.write("C");
-				for(int j=0;j<attributes.length;j++) {
-					String m = ","+attributes[j];
-					//System.out.println(m);
-					myWriter.write(m);		
-				}
-				myWriter.write("\n");
-			}
-			for (int i=0; i<new File(tempPath+"/d").list().length;i++) {
-				Attributes attr = new Attributes((String)("d/" + new File(tempPath+"/d").list()[i]));
-				String[] attributes = attr.getAttributes();
-				myWriter.write("D");
-				for(int j=0;j<attributes.length;j++) {
-					String m = ","+attributes[j];
-					//System.out.println(m);
-					myWriter.write(m);		
-				}
-				myWriter.write("\n");
+			String[] ab = new String[] {"A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"};
+			for(int k=0; k<ab.length;k++) {
+				for (int i = 0; i < new File(tempPath + "/letters/"+ab[k]).list().length; i++) {
+					Attributes attr = new Attributes((String) ("letters/" + ab[k]+"/" + new File(tempPath + "/letters/"+ab[k]).list()[i]));
+					String[] attributes = attr.getAttributes();
+					myWriter.write(ab[k]);
+					for (int j = 0; j < attributes.length; j++) {
+						String m = "," + attributes[j];
+						myWriter.write(m);
+					}
+					myWriter.write("\n");
+				}				
 			}
 			myWriter.close();
-		} catch(IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+//		BotUtil.downloadPage(new URL(LetterRecognition.DATA_URL), letterRecognitionFile);
 		System.out.println("Adding values to dataset: " + letterRecognitionFile);
 		return letterRecognitionFile;
 	}
@@ -114,7 +86,7 @@ public class LetterRecognition {
 			data.defineSourceColumn("xegvy", 14, ColumnType.continuous);
 			data.defineSourceColumn("y-ege", 15, ColumnType.continuous);
 			data.defineSourceColumn("yegvx", 16, ColumnType.continuous);
-			
+
 			// Define the column that we are trying to predict.
 			ColumnDefinition outputColumn = data.defineSourceColumn("letter", 0, ColumnType.nominal);
 
@@ -167,42 +139,46 @@ public class LetterRecognition {
 
 			// Display the final model.
 			System.out.println("Final model: " + bestMethod);
-			System.out.println();
 
 			// Loop over the entire, original, dataset and feed it through the model.
 			// This also shows how you would process new data, that was not part of your
 			// training set. You do not need to retrain, simply use the NormalizationHelper
 			// class. After you train, you can save the NormalizationHelper to later
 			// normalize and denormalize your data.
-			
-			//ReadCSV csv = new ReadCSV(letterRecognitionFile, false, CSVFormat.DECIMAL_POINT);
+
+			// ReadCSV csv = new ReadCSV(letterRecognitionFile, false,
+			// CSVFormat.DECIMAL_POINT);
 			String[] line = new String[16];
 			MLData input = helper.allocateInputVector();
-			Attributes test =new Attributes(imagePath);
+			Attributes test = new Attributes(imagePath);
 			String[] attributes = test.getAttributes();
-			
+			// while (csv.next()) {
 			StringBuilder result = new StringBuilder();
-			for(int i =0; i<16;i++) {
+			for (int i = 0; i < 16; i++) {
 				line[i] = attributes[i];
 			}
-			
+
+			// String correct = csv.get(0);
 			helper.normalizeInputVector(line, input.getData(), false);
-			//for(int i=0;i<line.length;i++) {
-			//	System.out.print(line[i] + ", ");
-			//}
-			//System.out.println();
-			
+			for (int i = 0; i < line.length; i++) {
+				System.out.print(line[i] + ", ");
+			}
+			System.out.println();
 			MLData output = bestMethod.compute(input);
 			String letterChosen = helper.denormalizeOutputVectorToString(output)[0];
 
-			//result.append(Arrays.toString(line));
+			result.append(Arrays.toString(line));
 			result.append(" -> predicted: ");
 			result.append(letterChosen);
-			
+			// result.append("(correct: ");
+			// result.append(correct);
+			// result.append(")");
+
 			System.out.println(result.toString());
-			
+			// }
+
 			// Delete data file and shut down.
-			//letterRecognitionFile.delete();
+			// letterRecognitionFile.delete();
 			Encog.getInstance().shutdown();
 
 		} catch (Exception ex) {
@@ -211,16 +187,14 @@ public class LetterRecognition {
 	}
 
 	public static void main(String[] args) {
-		
-		//Choose image from file system to recognize 
+		// Choose image from file system to recognize
 		final JFrame frame = new JFrame();
-        final JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
-        int retVal = fc.showOpenDialog(frame);
-        if (retVal == JFileChooser.APPROVE_OPTION) {
-        	File selectedFile = fc.getSelectedFile();
-        	imagePath = selectedFile.getAbsolutePath();
-        }
-        
+		final JFileChooser fc = new JFileChooser(System.getProperty("user.dir"));
+		int retVal = fc.showOpenDialog(frame);
+		if (retVal == JFileChooser.APPROVE_OPTION) {
+			File selectedFile = fc.getSelectedFile();
+			imagePath = selectedFile.getAbsolutePath();
+		}
 		LetterRecognition prg = new LetterRecognition();
 		prg.run(args);
 	}
