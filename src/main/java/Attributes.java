@@ -3,24 +3,30 @@ import java.io.File;
 import javax.imageio.ImageIO;
 
 public class Attributes {
+	public int[][] pixels;
+	public int[] indexes;
+	public int[][] boundingBoxTable;
 	
-	public int[][] pixels = getImageToPixels(loadImage());
-	public int[] indexes = boundingBox(pixels);
-	public int[][] boundingBoxTable = storeBoundingBox(pixels);
+	public Attributes(String path) {
+		this.pixels = getImageToPixels(loadImage(path));
+		this.indexes = boundingBox(pixels);
+		this.boundingBoxTable = storeBoundingBox(pixels);
+	}
 	
 	public int[][] storeBoundingBox(int[][] table){
-		int[][] bbTable = new int[indexes[1]-indexes[0]+1][indexes[3]-indexes[2]+1];
-		for(int i = indexes[0]; i<=indexes[1];i++) {
-			for(int j=indexes[2];j<=indexes[3];j++) {
-				bbTable[i-indexes[0]][j-indexes[2]] = table[i][j];
+		int[][] bbTable = new int[this.indexes[1]-this.indexes[0]+1][this.indexes[3]-this.indexes[2]+1];
+		for(int i = this.indexes[0]; i<=this.indexes[1];i++) {
+			for(int j=this.indexes[2];j<=this.indexes[3];j++) {
+				bbTable[i-this.indexes[0]][j-this.indexes[2]] = table[i][j];
 			}
 		}
 		return bbTable;
 	}
 	
-	public BufferedImage loadImage() {
+	public BufferedImage loadImage(String path) {
 		try {
-			BufferedImage bufferedImage = ImageIO.read(new File("alpha.png"));
+			System.out.println(path);
+			BufferedImage bufferedImage = ImageIO.read(new File(path));
 			return bufferedImage;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -34,24 +40,26 @@ public class Attributes {
 		}
 		int h = bufferedImage.getHeight();
 		int w = bufferedImage.getWidth();
-		int[][] pixels = new int[h][w];
+		int[][] pixls = new int[h][w];
 		for (int i = 0; i < h; i++) {
 			/**
 			 * get pixels from image
 			 */
-			bufferedImage.getRGB(0, i, w, 1, pixels[i], 0, w);
+			bufferedImage.getRGB(0, i, w, 1, pixls[i], 0, w);
 		}
-		for (int i=0; i<pixels.length; i++) {
-			for(int j=0; j<pixels[i].length; j++) {
-				if(pixels[i][j]<-1) {
-					pixels[i][j] = 1;
+		for (int i=0; i<pixls.length; i++) {
+			for(int j=0; j<pixls[i].length; j++) {
+				if(pixls[i][j]<-1) {
+					pixls[i][j] = 1;
 				}
 				else {
-					pixels[i][j] = 0;
+					pixls[i][j] = 0;
 				}
 			}
 		}
-		return pixels;
+		int [] x = new int[4];
+		x=boundingBox(pixls);
+		return pixls;
 	}
 	
 	public int[] boundingBox(int [][] pixls) {
@@ -93,7 +101,6 @@ public class Attributes {
 		return bb;
 	}
 	
-	
 	private int[] getCartesianCoordinates(int[] pos, int[][] table){
 		int[] coords = new int[2];
 		double[] center = new double[2];
@@ -115,32 +122,31 @@ public class Attributes {
 		return coords;
 	}
 	
-	
 	private double getAttr1() {
-		double attr1 = indexes[2]+(indexes[3]-indexes[2])/2; //x-box
+		double attr1 = this.indexes[2]+(this.indexes[3]-this.indexes[2])/2; //x-box
 		return attr1;
 	}
 	
 	private double getAttr2() {
-		double attr2 = indexes[0]+(indexes[1]-indexes[0])/2; //y-box
+		double attr2 = this.indexes[0]+(this.indexes[1]-this.indexes[0])/2; //y-box
 		return attr2;
 	}
 	
 	private double getAttr3() {
-		double attr3 = indexes[3]-indexes[2]+1; //width of bb
+		double attr3 = this.indexes[3]-this.indexes[2]+1; //width of bb
 		return attr3;
 	}
 	
 	private double getAttr4() {
-		double attr4 = indexes[1]-indexes[0]+1; //height of bb
+		double attr4 = this.indexes[1]-this.indexes[0]+1; //height of bb
         return attr4;
     }
 
-	private double getAttr5() {
+    private double getAttr5() {
     	double attr5 = 0; //num of 1s
-        for(int i=indexes[0]; i<=indexes[1]; i++) {
-        	for(int j=indexes[2]; j<=indexes[3]; j++) {
-        		if(pixels[i][j]==1)
+        for(int i=this.indexes[0]; i<=this.indexes[1]; i++) {
+        	for(int j=this.indexes[2]; j<=this.indexes[3]; j++) {
+        		if(this.pixels[i][j]==1)
         			attr5++;
         	}
         }
@@ -151,15 +157,15 @@ public class Attributes {
         double attr6 = 0; //mean horizontal position of on pixels
         int counter = 0;
         int sum = 0;
-        for (int i =0;i<boundingBoxTable.length;i++) {
-        	for (int j=0; j<boundingBoxTable[i].length;j++) {
-        		if(boundingBoxTable[i][j] == 1) {
+        for (int i =0;i<this.boundingBoxTable.length;i++) {
+        	for (int j=0; j<this.boundingBoxTable[i].length;j++) {
+        		if(this.boundingBoxTable[i][j] == 1) {
         			counter++;
-        			sum += getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[0];
+        			sum += getCartesianCoordinates(new int[] {i,j},this.boundingBoxTable)[0];
         		}
         	}
         }
-        attr6 = (((double)sum)/((double)counter)) / ((double)boundingBoxTable[0].length);
+        attr6 = (((double)sum)/((double)counter)) / ((double)this.boundingBoxTable[0].length);
         return attr6;
     }
 
@@ -167,11 +173,11 @@ public class Attributes {
     	double attr7 = 0; //mean vertical position of on pixels
         int counter = 0;
         int sum = 0;
-        for (int i =0;i<boundingBoxTable.length;i++) {
-        	for (int j=0; j<boundingBoxTable[i].length;j++) {
-        		if(boundingBoxTable[i][j] == 1) {
+        for (int i =0;i<this.boundingBoxTable.length;i++) {
+        	for (int j=0; j<this.boundingBoxTable[i].length;j++) {
+        		if(this.boundingBoxTable[i][j] == 1) {
         			counter++;
-        			sum += getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[1];
+        			sum += getCartesianCoordinates(new int[] {i,j},this.boundingBoxTable)[1];
         		}
         	}
         }
@@ -183,11 +189,11 @@ public class Attributes {
     	double attr8 = 0; //mean squared horizontal position of on pixels
         int counter = 0;
         int sum = 0;
-        for (int i =0;i<boundingBoxTable.length;i++) {
-        	for (int j=0; j<boundingBoxTable[i].length;j++) {
-        		if(boundingBoxTable[i][j] == 1) {
+        for (int i =0;i<this.boundingBoxTable.length;i++) {
+        	for (int j=0; j<this.boundingBoxTable[i].length;j++) {
+        		if(this.boundingBoxTable[i][j] == 1) {
         			counter++;
-        			int x = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[0];
+        			int x = getCartesianCoordinates(new int[] {i,j},this.boundingBoxTable)[0];
         			sum += x*x;
         		}
         	}
@@ -200,11 +206,11 @@ public class Attributes {
     	double attr9 = 0; //mean squared vertical position of on pixels
         int counter = 0;
         int sum = 0;
-        for (int i =0;i<boundingBoxTable.length;i++) {
-        	for (int j=0; j<boundingBoxTable[i].length;j++) {
-        		if(boundingBoxTable[i][j] == 1) {
+        for (int i =0;i<this.boundingBoxTable.length;i++) {
+        	for (int j=0; j<this.boundingBoxTable[i].length;j++) {
+        		if(this.boundingBoxTable[i][j] == 1) {
         			counter++;
-        			int y = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[1];
+        			int y = getCartesianCoordinates(new int[] {i,j},this.boundingBoxTable)[1];
         			sum += y*y;
         		}
         	}
@@ -217,12 +223,12 @@ public class Attributes {
     	double attr10 = 0; //mean product of horizontal and vertical position of on pixels
         int counter = 0;
         int sum = 0;
-        for (int i =0;i<boundingBoxTable.length;i++) {
-        	for (int j=0; j<boundingBoxTable[i].length;j++) {
-        		if(boundingBoxTable[i][j] == 1) {
+        for (int i =0;i<this.boundingBoxTable.length;i++) {
+        	for (int j=0; j<this.boundingBoxTable[i].length;j++) {
+        		if(this.boundingBoxTable[i][j] == 1) {
         			counter++;
-        			int x = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[0];
-        			int y = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[1];
+        			int x = getCartesianCoordinates(new int[] {i,j},this.boundingBoxTable)[0];
+        			int y = getCartesianCoordinates(new int[] {i,j},this.boundingBoxTable)[1];
         			sum += x*y;
         		}
         	}
@@ -235,12 +241,12 @@ public class Attributes {
     	double attr11 = 0; //mean product of  squared horizontal and vertical position of on pixels
         int counter = 0;
         int sum = 0;
-        for (int i =0;i<boundingBoxTable.length;i++) {
-        	for (int j=0; j<boundingBoxTable[i].length;j++) {
-        		if(boundingBoxTable[i][j] == 1) {
+        for (int i =0;i<this.boundingBoxTable.length;i++) {
+        	for (int j=0; j<this.boundingBoxTable[i].length;j++) {
+        		if(this.boundingBoxTable[i][j] == 1) {
         			counter++;
-        			int x = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[0];
-        			int y = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[1];
+        			int x = getCartesianCoordinates(new int[] {i,j},this.boundingBoxTable)[0];
+        			int y = getCartesianCoordinates(new int[] {i,j},this.boundingBoxTable)[1];
         			sum += x*x*y;
         		}
         	}
@@ -253,12 +259,12 @@ public class Attributes {
     	double attr12 = 0; //mean product of  horizontal and squared vertical position of on pixels
         int counter = 0;
         int sum = 0;
-        for (int i =0;i<boundingBoxTable.length;i++) {
-        	for (int j=0; j<boundingBoxTable[i].length;j++) {
-        		if(boundingBoxTable[i][j] == 1) {
+        for (int i =0;i<this.boundingBoxTable.length;i++) {
+        	for (int j=0; j<this.boundingBoxTable[i].length;j++) {
+        		if(this.boundingBoxTable[i][j] == 1) {
         			counter++;
-        			int x = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[0];
-        			int y = getCartesianCoordinates(new int[] {i,j},boundingBoxTable)[1];
+        			int x = getCartesianCoordinates(new int[] {i,j},this.boundingBoxTable)[0];
+        			int y = getCartesianCoordinates(new int[] {i,j},this.boundingBoxTable)[1];
         			sum += x*y*y;
         		}
         	}
@@ -269,11 +275,11 @@ public class Attributes {
 
     public double getAttr13() {
         double attr13 = 0.0; //x-edge
-        for(int i=0; i<boundingBoxTable.length; i++) {
-        	for(int j=0; j<boundingBoxTable[i].length; j++) {
-        		if(boundingBoxTable[i][j]==1 && j==0)
+        for(int i=0; i<this.boundingBoxTable.length; i++) {
+        	for(int j=0; j<this.boundingBoxTable[i].length; j++) {
+        		if(this.boundingBoxTable[i][j]==1 && j==0)
         			attr13++;
-        		else if(boundingBoxTable[i][j]==1 && boundingBoxTable[i][j-1]==0) {
+        		else if(this.boundingBoxTable[i][j]==1 && this.boundingBoxTable[i][j-1]==0) {
         			attr13++;
         		}
         	}
@@ -284,12 +290,12 @@ public class Attributes {
 
     public double getAttr14() {
         double attr14 = 0.0; //xegvy
-        for(int i=0; i<boundingBoxTable.length; i++) {
-        	for(int j=0; j<boundingBoxTable[i].length; j++) {
-        		if(boundingBoxTable[i][j]==1 && j==0)
-        			attr14+=getCartesianCoordinates(new int[] {i,j}, boundingBoxTable)[1];
-        		else if(boundingBoxTable[i][j]==1 && boundingBoxTable[i][j-1]==0) {
-        			attr14+=getCartesianCoordinates(new int[] {i,j}, boundingBoxTable)[1];
+        for(int i=0; i<this.boundingBoxTable.length; i++) {
+        	for(int j=0; j<this.boundingBoxTable[i].length; j++) {
+        		if(this.boundingBoxTable[i][j]==1 && j==0)
+        			attr14+=getCartesianCoordinates(new int[] {i,j}, this.boundingBoxTable)[1];
+        		else if(this.boundingBoxTable[i][j]==1 && this.boundingBoxTable[i][j-1]==0) {
+        			attr14+=getCartesianCoordinates(new int[] {i,j}, this.boundingBoxTable)[1];
         		}
         	}
         }
@@ -298,11 +304,11 @@ public class Attributes {
 
     public double getAttr15() {
         double attr15 = 0.0; //y-edge
-        for(int i=0; i<boundingBoxTable.length; i++) {
-        	for(int j=0; j<boundingBoxTable[i].length; j++) {
-        		if(boundingBoxTable[i][j]==1 && i==boundingBoxTable.length-1)
+        for(int i=0; i<this.boundingBoxTable.length; i++) {
+        	for(int j=0; j<this.boundingBoxTable[i].length; j++) {
+        		if(this.boundingBoxTable[i][j]==1 && i==this.boundingBoxTable.length-1)
         			attr15++;
-        		else if(boundingBoxTable[i][j]==1 && boundingBoxTable[i+1][j]==0) {
+        		else if(this.boundingBoxTable[i][j]==1 && this.boundingBoxTable[i+1][j]==0) {
         			attr15++;
         		}
         	}
@@ -313,20 +319,18 @@ public class Attributes {
 
     public double getAttr16() {
         double attr16 = 0.0; //yegvx
-        for(int i=0; i<boundingBoxTable.length; i++) {
-        	for(int j=0; j<boundingBoxTable[i].length; j++) {
-        		if(boundingBoxTable[i][j]==1 && i==boundingBoxTable.length-1)
-        			attr16+=getCartesianCoordinates(new int[] {i,j}, boundingBoxTable)[0];
-        		else if(boundingBoxTable[i][j]==1 && boundingBoxTable[i+1][j]==0) {
-        			attr16+=getCartesianCoordinates(new int[] {i,j}, boundingBoxTable)[0];
+        for(int i=0; i<this.boundingBoxTable.length; i++) {
+        	for(int j=0; j<this.boundingBoxTable[i].length; j++) {
+        		if(this.boundingBoxTable[i][j]==1 && i==this.boundingBoxTable.length-1)
+        			attr16+=getCartesianCoordinates(new int[] {i,j}, this.boundingBoxTable)[0];
+        		else if(this.boundingBoxTable[i][j]==1 && this.boundingBoxTable[i+1][j]==0) {
+        			attr16+=getCartesianCoordinates(new int[] {i,j}, this.boundingBoxTable)[0];
         		}
         	}
         }
         return attr16;
     }
-    
-    
-    
+	
     public String[] getAttributes () {
     	//scaling to 0-15 and return as string
     	String[] attributes = new String[16];
@@ -347,23 +351,9 @@ public class Attributes {
     	results[13] = getAttr14();
     	results[14] = getAttr15();
     	results[15] = getAttr16();
-    	double min = results[0];
-    	double max = results[0];
-    	for(int i = 0; i<results.length;i++) {
-    		if(results[i]<min) {
-    			min = results[i];
-    		}
-    		if(results[i]>max) {
-    			max = results[i];
-    		}
-    	}
-    	for(int i = 0; i<results.length;i++) {
-    		results[i] = ((results[i]-min)/(max-min))*15;
-    	}
     	for(int i = 0; i<attributes.length;i++) {
     		attributes[i] = Integer.toString((int) Math.round(results[i]));
     	}
     	return attributes;
     }
-	
 }
