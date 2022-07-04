@@ -25,7 +25,6 @@ public class Attributes {
 	
 	public BufferedImage loadImage(String path) {
 		try {
-			//System.out.println(path);
 			BufferedImage bufferedImage = ImageIO.read(new File(path));
 			return bufferedImage;
 		} catch (Exception e) {
@@ -332,7 +331,7 @@ public class Attributes {
     }
 	
     public String[] getAttributes () {
-    	
+    	//scaling to 0-15 and return as string
     	String[] attributes = new String[16];
     	double[] results = new double[16];
     	results[0] = getAttr1();
