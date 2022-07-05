@@ -1,6 +1,7 @@
 # LetterRecognition
 
 Recognition of Capital Latin letters in an input image by using its binary representation. The dataset used is based on UCI letter recognition dataset.
+
 The UCI letter recognition dataset is created by representing images of letters as binary, and then using that information to classify each image based on 16 attributes. Those attributes are: 
 1. x-box: the x position of the bounding box
 2. y-box: the y position of the bounding box 
@@ -19,9 +20,9 @@ The UCI letter recognition dataset is created by representing images of letters 
 15. y-ege: mean edge count bottom to top - edge is a pixel immediately above of 0 or boundary
 16. yegvx: correlation of y-ege with x
 
-The value of the above attributes in the uci dataset was scaled to 0-15, making the recognition of a letter in a new image not possible. Hence, a new dataset was formed, with the values of the attributes left unscaled, since the smaller amount of images did not make the creation of a classification method slow.
+The value of the above attributes in the UCI dataset was scaled to 0-15, making the recognition of a letter in a new image not possible. Hence, a new dataset was formed, with the values of the attributes left unscaled, since the smaller amount of images did not make the creation of a classification method slow.
 
-The api used to create and train the model for the recognition is encog.
+The API used to create and train the model for the recognition is Encog.
 
 UCI Letter Recognition Dataset: https://archive.ics.uci.edu/ml/datasets/letter+recognition
 
