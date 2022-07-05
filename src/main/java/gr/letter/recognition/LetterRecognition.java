@@ -105,8 +105,7 @@ public class LetterRecognition {
 				model.setReport(new ConsoleStatusReportable());
 
 				// Now normalize the data. Encog will automatically determine the correct
-				// normalization
-				// type based on the model you chose in the last step.
+				// normalization type based on the model you chose in the last step.
 				data.normalize();
 
 				// Hold back some data for a final validation.
@@ -121,12 +120,7 @@ public class LetterRecognition {
 				// Use a 5-fold cross-validated train. Return the best method found.
 				MLRegression bestMethod = (MLRegression) model.crossvalidate(5, true);
 
-				// Display the training and validation errors.
-				//System.out.println(
-				//		"Training error: " + EncogUtility.calculateRegressionError(bestMethod, model.getTrainingDataset()));
-				//System.out.println("Validation error: "
-				//		+ EncogUtility.calculateRegressionError(bestMethod, model.getValidationDataset()));
-
+				
 				// Display our normalization parameters.
 				NormalizationHelper helper = data.getNormHelper();
 				//System.out.println(helper.toString());
@@ -134,20 +128,12 @@ public class LetterRecognition {
 				// Display the final model.
 				//System.out.println("Final model: " + bestMethod);
 
-				// Loop over the entire, original, dataset and feed it through the model.
-				// This also shows how you would process new data, that was not part of your
-				// training set. You do not need to retrain, simply use the NormalizationHelper
-				// class. After you train, you can save the NormalizationHelper to later
-				// normalize and denormalize your data.
-
-				// ReadCSV csv = new ReadCSV(letterRecognitionFile, false,
-				// CSVFormat.DECIMAL_POINT);
+				
 				String[] line = new String[16];
 				MLData input = helper.allocateInputVector();
 				Attributes test = new Attributes(imagePath);
 				String[] attributes = test.getAttributes();
 				
-				StringBuilder result = new StringBuilder();
 				for (int i = 0; i < 16; i++) {
 					line[i] = attributes[i];
 				}
@@ -187,7 +173,6 @@ public class LetterRecognition {
 				indx = b;
 			}
 		}
-		
 		return ab[indx];
 	}
 
